@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import ExpenseListItem from './ExpenseListItems'
 import getVisibleExpenses from '../selectors/expenses'
 
-const ExpenseList = (props)=> (
+export const ExpenseList = (props)=> (
     <div>
         <h1>ExpenseList</h1>
         {props.expenses.map((expense) => {
