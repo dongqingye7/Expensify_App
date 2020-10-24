@@ -1,18 +1,9 @@
-import React, { Component } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import AppRouter from "./routers/AppRouter";
 import configureStore from "./store/configureStore";
 
-import { addExpense, removeExpense, editExpense } from "./actions/expenses";
-import getVisibleExpenses from "./selectors/expenses";
-import {
-  setTextFilter,
-  setStartDate,
-  setEndDate,
-  sortByDate,
-  sortByAmount,
-} from "./actions/filters";
 
 import "normalize.css/normalize.css";
 import "./styles/styles.scss";
