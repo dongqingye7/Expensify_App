@@ -1,4 +1,4 @@
-import {ExpenseList} from '../../components/EspenseList'
+import {ExpenseList} from '../../components/ExpenseList'
 import {shallow} from 'enzyme';
 import React from 'react';
 import expenses from '../fixtures/expenses';
