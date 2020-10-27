@@ -39,13 +39,13 @@
     "style-loader": "^1.2.1",
     "uuid": "^8.3.1",
     "webpack": "^4.44.1",
-    "webpack-cli": "^3.3.12"
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
   },
   "devDependencies": {
     "enzyme": "^3.11.0",
     "enzyme-to-json": "^3.6.1",
     "jest": "^26.5.3",
-    "react-test-renderer": "^16.14.0",
-    "webpack-dev-server": "^3.11.0"
+    "react-test-renderer": "^16.14.0"
   }
 }
