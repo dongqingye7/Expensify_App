@@ -3,23 +3,28 @@ import {
   addExpense,
   editExpense,
   removeExpense,
-  setExpenses, startSetExpenses
+  setExpenses,
+  startSetExpenses,
+  startRemoveExpense,
+  startEditExpense,
 } from "../../actions/expenses";
 import expenses from "../fixtures/expenses";
 import configureMockStore from "redux-mock-store";
 import thunk from "redux-thunk";
-import database from '../../firebase/firebase';
+import database from "../../firebase/firebase";
 
 const createMockStore = configureMockStore([thunk]);
 
-beforeEach((done)=>{
+beforeEach((done) => {
   const expensesData = {};
-  expenses.forEach(({id, description, note, amount, createdAt})=>{
-    expensesData[id] = {description, note, amount, createdAt}
-  })
-  database.ref('expenses').set(expensesData).then(()=> done())
-})
-
+  expenses.forEach(({ id, description, note, amount, createdAt }) => {
+    expensesData[id] = { description, note, amount, createdAt };
+  });
+  database
+    .ref("expenses")
+    .set(expensesData)
+    .then(() => done());
+});
 
 test("should remove expense action object", () => {
   const action = removeExpense({ id: "123abc" });
@@ -68,9 +73,9 @@ test("should add expense to database and store", (done) => {
           ...expenseData,
         },
       });
-      return database.ref(`expenses/${actions[0].expense.id}`).once('value');
-      
-    }).then((snapshot)=>{
+      return database.ref(`expenses/${actions[0].expense.id}`).once("value");
+    })
+    .then((snapshot) => {
       expect(snapshot.val()).toEqual(expenseData);
       done();
     });
@@ -79,10 +84,10 @@ test("should add expense to database and store", (done) => {
 test("should add expense with default to database and store", (done) => {
   const store = createMockStore({});
   const expenseDefault = {
-      description: "",
-      note : "",
-      amount : 0,
-      createdAt : 0,
+    description: "",
+    note: "",
+    amount: 0,
+    createdAt: 0,
   };
 
   store
@@ -96,32 +101,67 @@ test("should add expense with default to database and store", (done) => {
           ...expenseDefault,
         },
       });
-      return database.ref(`expenses/${actions[0].expense.id}`).once('value');
-      
-    }).then((snapshot)=>{
+      return database.ref(`expenses/${actions[0].expense.id}`).once("value");
+    })
+    .then((snapshot) => {
       expect(snapshot.val()).toEqual(expenseDefault);
       done();
     });
 });
 
 test("should set expenses action object with data", () => {
-  const action = setExpenses(expenses)
+  const action = setExpenses(expenses);
   expect(action).toEqual({
     type: "SET_EXPENSES",
-    expenses: expenses
+    expenses: expenses,
   });
 });
 
-
 test("should fetch expenses from firebase", (done) => {
   const store = createMockStore({});
-store.dispatch(startSetExpenses()).then(()=>{
-  const action = store.getActions();
-  expect(action[0]).toEqual({
-    type: 'SET_EXPENSES',
-    expenses
-  })
-  done();
-})
+  store.dispatch(startSetExpenses()).then(() => {
+    const action = store.getActions();
+    expect(action[0]).toEqual({
+      type: "SET_EXPENSES",
+      expenses,
+    });
+    done();
+  });
 });
 
+test("should remove expense from firebase", (done) => {
+  const store = createMockStore({});
+  const id = expenses[0].id;
+  store
+    .dispatch(startRemoveExpense({ id }))
+    .then(() => {
+      const action = store.getActions();
+      expect(action[0]).toEqual({
+        type: "REMOVE_EXPENSE",
+        id,
+      });
+      return database.ref(`expenses/${id}`).once("value");
+    })
+    .then((snapshot) => {
+      expect(snapshot.val()).toBeFalsy();
+      done();
+    });
+});
+
+test("should edit expense from firebase", (done) => {
+  const store = createMockStore({});
+  const id = expenses[0].id;
+  const updates = { note: "new update" };
+  store.dispatch(startEditExpense(id, updates)).then(() => {
+    const action = store.getActions();
+    expect(action[0]).toEqual({
+      type: "EDIT_EXPENSE",
+      id,
+      updates,
+    });
+    return database.ref(`expenses/${id}`).once("value");
+  }).then((snapshot) => {
+    expect(snapshot.val().note).toBe(updates.note);
+    done();
+  });
+});
